@@ -12,7 +12,7 @@ Table of Contents: N/A
 
 Installation: 
 
-Usage: Update the variables to match what is created in your environment.
+Usage: Run the SecurePwd.ps1 to create the secure password file and then run SnapCreator.ps1 after updating the variables to match what is created in your environment.
 
 Contributing: 
 
