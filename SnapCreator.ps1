@@ -1,5 +1,6 @@
 #Requires -Modules VMware.VimAutomation.Core
 
+#Connect to vCenter
 $user = "service.vra"
 $pwd = Get-Content "C:\Scripts\VMware\Credential.txt"
 $vcenter = "vswcrpvmwvc01"
@@ -7,6 +8,7 @@ $securepwd = $pwd | ConvertTo-SecureString
 $credObject = New-Object System.Management.Automation.PSCredential -ArgumentList $user, $securePwd
 
 Connect-VIServer -Server $vcenter -Credential $credObject
+
 
 function Get-SnapshotCreator {
 <# 
@@ -120,7 +122,7 @@ function Get-SnapshotCreator {
     }
 }
 
-
+#Format email for html and table
 
 $head=@"
 <style>
@@ -156,24 +158,15 @@ background-color:#EAF2D3;
 </style>
 "@
 
+#Email creation and sending information
 
 $report = Get-VM | Get-Snapshot | Get-SnapshotCreator | Where {$_.Created -lt ((Get-Date).AddDays(-7))} | ConvertTo-Html -Head $head -PreContent "<H2>Snapshot Report: > 7 Days</H2>" | Out-String
-
-$smtpServer = ìwebmail.allegiantair.comî
-
+$smtpServer = "webmail.allegiantair.com"
 $msg = new-object Net.Mail.MailMessage
-
 $smtp = new-object Net.Mail.SmtpClient($smtpServer)
-
-$msg.From = ìvROnotifiations@allegiantair.comî
-
+$msg.From = "vROnotifiations@allegiantair.com"
 $msg.To.Add("DEP_Data_Center_Virtualization@allegiantair.com")
-#,bradley.phelps@allegiantair.com,nicholas.wilson@allegiantair.com
-
-$msg.Subject = ìVSWCRPVMWVC01 Snapshots Older Than 7 Days Reportî
-
+$msg.Subject = "VSWCRPVMWVC01 Snapshots Older Than 7 Days Report"
 $msg.IsBodyHTML = $true
-
 $msg.Body = $report
-
 $smtp.Send($msg)
